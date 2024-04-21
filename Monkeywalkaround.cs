@@ -14,6 +14,7 @@ using System.Xml.Linq;
 using Il2CppAssets.Scripts;
 using BTD_Mod_Helper.Api.Components;
 using BTD_Mod_Helper.Api.ModOptions;
+using Il2CppAssets.Scripts.Unity.UI_New.InGame.TowerSelectionMenu;
 
 [assembly: MelonInfo(typeof(Monkeywalkaround.Monkeywalkaround), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
@@ -32,6 +33,7 @@ public class Monkeywalkaround : BloonsTD6Mod
         description = "Controls the Movement Speed of your Towers"
 
     };
+    private static readonly ModSettingBool TowerCollides = new(true);
 
     static int rnd(int min, int max)
     {
@@ -64,8 +66,9 @@ public class Monkeywalkaround : BloonsTD6Mod
             {
                 if (towers[i] != null)
                 {
-                    for(int i2 = 0; i2<TimeManager.networkScale * MovmentSpeedMultiplier; i2++)
+                    for (int i2 = 0; i2 < TimeManager.networkScale * MovmentSpeedMultiplier; i2++)
                     {
+                        
                         Il2CppAssets.Scripts.Simulation.SMath.Vector2 newPos = CalculateNewPosition(towers[i].Position.X, towers[i].Position.Z, towers[i].Position.Y, towers[i].Rotation + 90);
                         bool allowedToMove = true;
                         // Check if tower is within the allowable Y-axis upper bound and move upwards
@@ -95,15 +98,35 @@ public class Monkeywalkaround : BloonsTD6Mod
                             towers[i].RotateTower(rnd(-90, 90), false, false);
                             allowedToMove = false;
                         }
-                        //TowerModel dartMonkey = Game.instance.model.GetTowerWithName(TowerType.DartMonkey).Duplicate();
-                        //ModHelper.Msg<Monkeywalkaround>("id: " + InGame.instance.bridge.MyPlayerNumber + "  bool: " + InGame.Bridge.CanPlaceTowerAt(new UnityEngine.Vector2(newPos.x, newPos.y), dartMonkey, InGame.instance.bridge.MyPlayerNumber, ObjectId.FromString("1231")));
-                        
-                        
-                        /*if (InGame.Bridge.CanPlaceTowerAt(new UnityEngine.Vector2(newPos.x, newPos.y), dartMonkey, InGame.instance.bridge.MyPlayerNumber, ObjectId.FromString("1231")))
+                        List<Tower> towers2 = InGame.instance.GetTowers();
+                        if (TowerCollides)
                         {
-                            towers[i].RotateTower(rnd(-90, 90), false, false);
-                            allowedToMove = false;
-                        }*/
+                            int TC2 = towers2.Count;
+                            ModHelper.Msg<Monkeywalkaround>(towers[i].towerModel.radius);
+                            for (int iT = 0; iT < TC2; iT++)
+                            {
+                                if (towers2[iT] != null && TC2 >= 2)
+                                {
+                                    if (towers2[iT].Position.X != towers[i].Position.X)
+                                    {
+                                        float maxDistance = 3 + towers2[iT].towerModel.radius;
+                                        UnityEngine.Vector2 thisPosition = new UnityEngine.Vector2(newPos.x, newPos.y);
+                                        UnityEngine.Vector2 otherPosition = new UnityEngine.Vector2(towers2[iT].Position.X, towers2[iT].Position.Y);
+
+                                        // Berechne die Distanz zwischen den Positionen
+                                        float distance = UnityEngine.Vector2.Distance(thisPosition, otherPosition);
+
+                                        // Wenn die Distanz kleiner oder gleich der maximalen Entfernung ist
+                                        if (distance <= maxDistance)
+                                        {
+                                            //ModHelper.Msg<Monkeywalkaround>("distance: " + distance + " x1: " + newPos.x + " x2: " + towers2[iT].Position.X);
+                                            towers[i].RotateTower(rnd(-90, 90), false, false);
+                                            allowedToMove = false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         if (allowedToMove)
                         {
                             towers[i].PositionTower(newPos);
