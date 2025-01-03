@@ -15,6 +15,7 @@ using Il2CppAssets.Scripts;
 using BTD_Mod_Helper.Api.Components;
 using BTD_Mod_Helper.Api.ModOptions;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame.TowerSelectionMenu;
+using BTD_Mod_Helper.Api.Helpers;
 
 [assembly: MelonInfo(typeof(Monkeywalkaround.Monkeywalkaround), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
@@ -66,7 +67,8 @@ public class Monkeywalkaround : BloonsTD6Mod
             {
                 if (towers[i] != null)
                 {
-                    for (int i2 = 0; i2 < TimeManager.networkScale * MovmentSpeedMultiplier; i2++)
+                    //Debug.Log("TimeScale: " + TimeHelper.OverrideFastForwardTimeScale);
+                    for (int i2 = 0; i2 <1 * MovmentSpeedMultiplier; i2++)
                     {
                         
                         Il2CppAssets.Scripts.Simulation.SMath.Vector2 newPos = CalculateNewPosition(towers[i].Position.X, towers[i].Position.Z, towers[i].Position.Y, towers[i].Rotation + 90);
@@ -102,7 +104,7 @@ public class Monkeywalkaround : BloonsTD6Mod
                         if (TowerCollides)
                         {
                             int TC2 = towers2.Count;
-                            ModHelper.Msg<Monkeywalkaround>(towers[i].towerModel.radius);
+                            //ModHelper.Msg<Monkeywalkaround>(towers[i].towerModel.radius);
                             for (int iT = 0; iT < TC2; iT++)
                             {
                                 if (towers2[iT] != null && TC2 >= 2)
